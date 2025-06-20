@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainfall Prediction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: all 0.5s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .button.exit {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin-left: 10px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .button {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 class="title">🌧️ Rainfall Prediction System</h1>
+            <p class="subtitle">Enter weather parameters to predict tomorrow's rainfall</p>
+            
+            <form id="predictionForm" method="POST" action="/predict">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" placeholder="Enter location" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="minTemp">Min Temperature (°C)</label>
+                        <input type="number" id="minTemp" name="minTemp" step="0.1" placeholder="e.g., 15.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxTemp">Max Temperature (°C)</label>
+                        <input type="number" id="maxTemp" name="maxTemp" step="0.1" placeholder="e.g., 25.8" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rainfall">Rainfall (mm)</label>
+                        <input type="number" id="rainfall" name="rainfall" step="0.1" placeholder="e.g., 2.3" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windGustSpeed">Wind Gust Speed (km/h)</label>
+                        <input type="number" id="windGustSpeed" name="windGustSpeed" step="0.1" placeholder="e.g., 35.2" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windSpeed9am">Wind Speed 9am (km/h)</label>
+                        <input type="number" id="windSpeed9am" name="windSpeed9am" step="0.1" placeholder="e.g., 15.0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windSpeed3pm">Wind Speed 3pm (km/h)</label>
+                        <input type="number" id="windSpeed3pm" name="windSpeed3pm" step="0.1" placeholder="e.g., 18.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="humidity9am">Humidity 9am (%)</label>
+                        <input type="number" id="humidity9am" name="humidity9am" min="0" max="100" placeholder="e.g., 65" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="humidity3pm">Humidity 3pm (%)</label>
+                        <input type="number" id="humidity3pm" name="humidity3pm" min="0" max="100" placeholder="e.g., 45" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pressure9am">Pressure 9am (hPa)</label>
+                        <input type="number" id="pressure9am" name="pressure9am" step="0.1" placeholder="e.g., 1015.2" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pressure3pm">Pressure 3pm (hPa)</label>
+                        <input type="number" id="pressure3pm" name="pressure3pm" step="0.1" placeholder="e.g., 1012.8" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="temp9am">Temperature 9am (°C)</label>
+                        <input type="number" id="temp9am" name="temp9am" step="0.1" placeholder="e.g., 18.3" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="temp3pm">Temperature 3pm (°C)</label>
+                        <input type="number" id="temp3pm" name="temp3pm" step="0.1" placeholder="e.g., 23.7" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select id="month" name="month" required>
+                            <option value="">Select Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rainToday">Rain Today</label>
+                        <select id="rainToday" name="rainToday" required>
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windGustDir">Wind Gust Direction</label>
+                        <select id="windGustDir" name="windGustDir" required>
+                            <option value="">Select Direction</option>
+                            <option value="N">North</option>
+                            <option value="NE">Northeast</option>
+                            <option value="E">East</option>
+                            <option value="SE">Southeast</option>
+                            <option value="S">South</option>
+                            <option value="SW">Southwest</option>
+                            <option value="W">West</option>
+                            <option value="NW">Northwest</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windDir9am">Wind Direction 9am</label>
+                        <select id="windDir9am" name="windDir9am" required>
+                            <option value="">Select Direction</option>
+                            <option value="N">North</option>
+                            <option value="NE">Northeast</option>
+                            <option value="E">East</option>
+                            <option value="SE">Southeast</option>
+                            <option value="S">South</option>
+                            <option value="SW">Southwest</option>
+                            <option value="W">West</option>
+                            <option value="NW">Northwest</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="windDir3pm">Wind Direction 3pm</label>
+                        <select id="windDir3pm" name="windDir3pm" required>
+                            <option value="">Select Direction</option>
+                            <option value="N">North</option>
+                            <option value="NE">Northeast</option>
+                            <option value="E">East</option>
+                            <option value="SE">Southeast</option>
+                            <option value="S">South</option>
+                            <option value="SW">Southwest</option>
+                            <option value="W">West</option>
+                            <option value="NW">Northwest</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-container">
+                    <button type="submit" class="button" id="predictBtn">
+                        🔮 Predict Weather
+                    </button>
+                    <a href="/exit"><button type="button" class="button exit">
+                        🚪 Exit
+                    </button>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-fill month based on selected date
+        document.getElementById('date').addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const month = selectedDate.getMonth() + 1; // getMonth() returns 0-11
+            document.getElementById('month').value = month;
+        });
+    </script>
+</body>
+</html>
